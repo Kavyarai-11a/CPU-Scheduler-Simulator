@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPU Scheduling Algorithm Simulator - CS Hackathon</title>
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="src/css/style.css">
+  <!-- Core Simulator Engine -->
+  <script src="src/js/simulator.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- HEADER SECTION -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo-icon">⚡</div>
+        <div>
+          <h1>CPU Scheduling Algorithm Simulator</h1>
+          <p class="subtitle">Interactive 12-Hour College Hackathon Project | B.Tech Computer Science</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-tech">Vanilla JS & CSS3</span>
+        <span class="badge badge-offline">100% Offline Ready</span>
+        <span class="badge badge-status">Verifiable Calculations</span>
+      </div>
+    </header>
+
+    <!-- SYSTEM ASSUMPTIONS & SCHEDULING RULES BANNER -->
+    <section class="card rules-card">
+      <div class="card-header">
+        <h2>ℹ️ Standard Scheduling Assumptions & Rules</h2>
+      </div>
+      <div class="rules-grid">
+        <div class="rule-item">
+          <strong class="rule-title">FCFS</strong>
+          <span class="rule-desc">First-Come First-Served (Non-Preemptive)</span>
+        </div>
+        <div class="rule-item">
+          <strong class="rule-title">SJF</strong>
+          <span class="rule-desc">Shortest Job First (Non-Preemptive)</span>
+        </div>
+        <div class="rule-item">
+          <strong class="rule-title">Priority</strong>
+          <span class="rule-desc">Non-Preemptive (Smaller # = Higher Priority)</span>
+        </div>
+        <div class="rule-item">
+          <strong class="rule-title">Round Robin</strong>
+          <span class="rule-desc">Preemptive (Time Quantum based)</span>
+        </div>
+        <div class="rule-item">
+          <strong class="rule-title">Tie-Breaking</strong>
+          <span class="rule-desc">Earlier Arrival Time → Smaller Process ID</span>
+        </div>
+        <div class="rule-item">
+          <strong class="rule-title">Formulas</strong>
+          <span class="rule-desc">TAT = CT − AT &nbsp; | &nbsp; WT = TAT − BT</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ERROR & VALIDATION ALERT BOX -->
+    <div id="errorAlert" class="error-alert hidden">
+      <div class="error-header">
+        <span>⚠️ Input Validation Errors:</span>
+        <button id="closeErrorBtn" class="btn-icon">&times;</button>
+      </div>
+      <ul id="errorList"></ul>
+    </div>
+
+    <!-- MAIN DASHBOARD CONTENT (INPUT & CONTROLS) -->
+    <main class="main-content">
+      
+      <!-- INPUT SECTION CARD -->
+      <section class="card input-card">
+        <div class="card-header space-between">
+          <h2>📥 Process Input Workload</h2>
+          <div class="preset-controls">
+            <label for="sampleDataSelect">Load Preset Test Case:</label>
+            <select id="sampleDataSelect" class="form-select">
+              <option value="">-- Choose Sample Workload --</option>
+              <option value="tc1">TC1: All Processes at t = 0</option>
+              <option value="tc2">TC2: Staggered Arrival Times</option>
+              <option value="tc3">TC3: CPU Idle Time Gap</option>
+              <option value="tc4">TC4: Equal Burst Times & Ties</option>
+              <option value="tc6">TC6: Round Robin Rotations</option>
+              <option value="tc7">TC7: Mid-Execution Arrival</option>
+              <option value="tc8">TC8: Single Process Case</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- PROCESS INPUT TABLE -->
+        <div class="table-wrapper">
+          <table class="data-table" id="inputProcessTable">
+            <thead>
+              <tr>
+                <th>Process ID</th>
+                <th>Arrival Time</th>
+                <th>Burst Time</th>
+                <th>Priority</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="processTableBody">
+              <!-- Default Rows injected dynamically by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- INPUT CONTROL BUTTONS & TIME QUANTUM -->
+        <div class="input-actions-bar">
+          <div class="action-buttons-left">
+            <button id="addProcessBtn" class="btn btn-secondary">➕ Add Process</button>
+            <button id="clearAllBtn" class="btn btn-outline-danger">🗑️ Clear All</button>
+          </div>
+
+          <div class="quantum-control-group">
+            <label for="timeQuantumInput">Round Robin Time Quantum (TQ):</label>
+            <input type="number" id="timeQuantumInput" class="form-control" value="2" min="1" step="1">
+          </div>
+        </div>
+
+        <!-- SIMULATION EXECUTION TRIGGER -->
+        <div class="simulation-trigger-bar">
+          <button id="runSimulationBtn" class="btn btn-primary btn-large">🚀 Run Simulation (All 4 Algorithms)</button>
+          <button id="resetSimulationBtn" class="btn btn-secondary btn-large">🔄 Reset Default</button>
+        </div>
+      </section>
+
+      <!-- RESULTS SECTION (GENERATED UPON SIMULATION RUN) -->
+      <div id="resultsWrapper" class="results-wrapper hidden">
+        
+        <!-- COMPARISON & RECOMMENDED ALGORITHM SUMMARY CARD -->
+        <section class="card comparison-card" id="comparisonSection">
+          <div class="card-header">
+            <h2>📊 Algorithm Performance Comparison & Recommendation</h2>
+          </div>
+          
+          <div class="comparison-grid">
+            <!-- Table View -->
+            <div class="comparison-table-container">
+              <h3>Overall Metrics Summary</h3>
+              <table class="data-table comparison-table">
+                <thead>
+                  <tr>
+                    <th>Algorithm</th>
+                    <th>Execution Model</th>
+                    <th>Avg Waiting Time</th>
+                    <th>Avg Turnaround Time</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="comparisonTableBody">
+                  <!-- Injected by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Visual Comparison Dual Bar Chart -->
+            <div class="comparison-chart-container">
+              <h3>Avg Waiting & Turnaround Time Chart</h3>
+              <div id="visualComparisonChart" class="visual-bar-chart">
+                <!-- SVG/CSS Bar Chart rendered dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Recommendation Banner -->
+          <div id="recommendationBanner" class="recommendation-banner">
+            <!-- Recommendation text injected by JS -->
+          </div>
+        </section>
+
+        <!-- ALGORITHM SPECIFIC RESULTS TABS / CARDS -->
+        <section class="card results-card">
+          <div class="card-header space-between">
+            <h2>📈 Detailed Algorithm Results & Gantt Charts</h2>
+            
+            <div class="tab-buttons" id="algorithmTabs">
+              <button class="tab-btn active" data-tab="FCFS">FCFS</button>
+              <button class="tab-btn" data-tab="SJF">SJF (Non-Preemptive)</button>
+              <button class="tab-btn" data-tab="Priority">Priority</button>
+              <button class="tab-btn" data-tab="RoundRobin">Round Robin</button>
+            </div>
+          </div>
+
+          <!-- TAB CONTENT CONTAINER -->
+          <div id="tabContentContainer" class="tab-content-container">
+            
+            <!-- FCFS TAB -->
+            <div class="tab-pane active" id="pane-FCFS">
+              <!-- Content rendered dynamically -->
+            </div>
+
+            <!-- SJF TAB -->
+            <div class="tab-pane" id="pane-SJF">
+              <!-- Content rendered dynamically -->
+            </div>
+
+            <!-- PRIORITY TAB -->
+            <div class="tab-pane" id="pane-Priority">
+              <!-- Content rendered dynamically -->
+            </div>
+
+            <!-- ROUND ROBIN TAB -->
+            <div class="tab-pane" id="pane-RoundRobin">
+              <!-- Content rendered dynamically -->
+            </div>
+
+          </div>
+        </section>
+
+        <!-- INNOVATION FEATURE: PROCESS STATE & TIMELINE STEPPER -->
+        <section class="card stepper-card" id="stepperSection">
+          <div class="card-header">
+            <h2>🔍 Process State Timeline Visualizer (Ready → Running → Completed)</h2>
+          </div>
+          
+          <div class="stepper-controls">
+            <div class="stepper-alg-select">
+              <label for="stepperAlgSelect">Algorithm to Visualize:</label>
+              <select id="stepperAlgSelect" class="form-select">
+                <option value="FCFS">FCFS</option>
+                <option value="SJF">SJF</option>
+                <option value="Priority">Priority</option>
+                <option value="RoundRobin">Round Robin</option>
+              </select>
+            </div>
+
+            <div class="stepper-slider-container">
+              <label for="timeStepSlider">Timeline Step: <strong id="timeStepLabel">t = 0</strong></label>
+              <input type="range" id="timeStepSlider" min="0" max="100" value="0" step="1">
+            </div>
+
+            <div class="stepper-buttons">
+              <button id="prevTimeStepBtn" class="btn btn-secondary">◀ Step Back</button>
+              <button id="playTimeStepBtn" class="btn btn-primary">▶ Play Animation</button>
+              <button id="nextTimeStepBtn" class="btn btn-secondary">Step Forward ▶</button>
+            </div>
+          </div>
+
+          <!-- STATE PIPELINE DISPLAY -->
+          <div class="state-pipeline">
+            <div class="state-box state-ready">
+              <h3>🟡 Ready Queue</h3>
+              <div id="readyQueueBox" class="process-badges-container">
+                <span class="empty-badge">Empty</span>
+              </div>
+            </div>
+
+            <div class="state-box state-running">
+              <h3>🟢 Running on CPU</h3>
+              <div id="runningCPUBox" class="process-badges-container">
+                <span class="empty-badge">CPU Idle</span>
+              </div>
+            </div>
+
+            <div class="state-box state-completed">
+              <h3>🏁 Completed</h3>
+              <div id="completedQueueBox" class="process-badges-container">
+                <span class="empty-badge">None</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div> <!-- /resultsWrapper -->
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <p>CPU Scheduling Algorithm Simulator | Built for 12-Hour CS Hackathon | Verifiable & Local Execution</p>
+    </footer>
+
+  </div>
+
+  <!-- Main UI Application Handler -->
+  <script src="src/js/app.js"></script>
+</body>
+</html>
